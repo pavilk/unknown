@@ -39,22 +39,34 @@ def solve(edges: list[tuple[str, str]]) -> list[str]:
         if point[-1] == end_lvl:
             if outs_at_lvl:
                 outs_at_lvl.sort()
-                close_out = outs_at_lvl[0]
+                min_out = outs_at_lvl[0][0]
+                close_outs = [x for x in outs_at_lvl if min_out in x]
+                close_outs.sort()
                 if my_turn:
-                    result.append(close_out)
+                    ways.sort()
+                    for chose_out in close_outs:
+                        for el in ways:
+                            if el[-1] == chose_out[1]:
+                                closed_out = chose_out
+                                break
+                        else:
+                            continue
+                        break
+                    result.append(closed_out)
                     outs_count -= 1
-                    ind = g[close_out[1]][0].index(close_out[0])
-                    g[close_out[1]][0].pop(ind)
+                    ind = g[closed_out[1]][0].index(closed_out[0])
+                    g[closed_out[1]][0].pop(ind)
                     que = deque()
                     que.append([start_lvl])
                     my_turn = False
                 else:
-                    prev_point = close_out[1]
                     monstr_move = 'z'
+                    ways.sort()
                     for el in ways:
-                        if el[-1] == prev_point:
-                            monstr_move = el[1]
-                            break
+                        for chose_out in close_outs:
+                            if el[-1] == chose_out[1]:
+                                monstr_move = el[1]
+                                break
                     que = deque()
                     que.append([monstr_move])
                     start_lvl = monstr_move
@@ -110,7 +122,6 @@ def add_edge(d: dict, edge: tuple[str, str]):
 
 def main():
     edges = []
-    
     for line in sys.stdin:
         line = line.strip()
         if line:
