@@ -122,6 +122,7 @@ def add_edge(d: dict, edge: tuple[str, str]):
 
 def main():
     edges = []
+    
     for line in sys.stdin:
         line = line.strip()
         if line:
