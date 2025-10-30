@@ -26,6 +26,7 @@ def solve(edges: list[tuple[str, str]]) -> list[str]:
             continue
         ways.append(point)
         visited.add(point[-1])
+
         for out in g[point[-1]][0]:
             outs_at_lvl.append((out, point[-1]))
 
@@ -78,7 +79,10 @@ def solve(edges: list[tuple[str, str]]) -> list[str]:
                 end_lvl = g[first[0]][1][-1]
                 que.append(first)
             else:
-                end_lvl = g[point[-1]][1][-1]
+                for el in reversed(g[point[-1]][1]):
+                    if el not in visited:
+                        end_lvl = el
+                        break
 
     return ["-".join(x) for x in result]
 
@@ -122,8 +126,9 @@ def add_edge(d: dict, edge: tuple[str, str]):
 
 def main():
     edges = []
-    
+    # q = "a-b\nb-c\nc-d\nc-e\nA-d\nA-e\nc-f\nc-g\nf-B\ng-B"
     for line in sys.stdin:
+    # for line in q.split("\n"):
         line = line.strip()
         if line:
             node1, sep, node2 = line.partition('-')
