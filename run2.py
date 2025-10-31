@@ -68,6 +68,9 @@ def solve(edges: list[tuple[str, str]]) -> list[str]:
                             if el[-1] == chose_out[1]:
                                 monstr_move = el[1]
                                 break
+                        else:
+                            continue
+                        break
                     que = deque()
                     que.append([monstr_move])
                     start_lvl = monstr_move
