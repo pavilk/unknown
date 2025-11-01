@@ -5,8 +5,8 @@ from collections import deque
 
 def solve(edges: list[tuple[str, str]]) -> list[str]:
     g = {}
-    outs = {}
-    outs_count = create_graph(edges, g, outs)
+    outs_dict = {}
+    total_outs = create_graph(edges, g, outs_dict)
     for keys in g.keys():
         g[keys][0].sort()
         g[keys][1].sort()
@@ -14,13 +14,15 @@ def solve(edges: list[tuple[str, str]]) -> list[str]:
     result = []
     que = deque()
     que.append(['a'])
+    ways_to_outs = list()
     start_lvl = 'a'
     end_lvl = g['a'][1][-1]
-    outs_at_lvl = list()
+    outs = list()
     my_turn = True
     visited = set()
     ways = list()
-    while que:
+    outs_counter = 0
+    while total_outs != 0 and que:
         point = que.popleft()
         if point[-1] in visited:
             continue
@@ -28,7 +30,11 @@ def solve(edges: list[tuple[str, str]]) -> list[str]:
         visited.add(point[-1])
 
         for out in g[point[-1]][0]:
-            outs_at_lvl.append((out, point[-1]))
+            outs_counter += 1
+            outs.append((out, point[-1]))
+            new_way_to_out = copy.deepcopy(point)
+            new_way_to_out.append(out)
+            ways_to_outs.append(new_way_to_out)
 
         for el in g[point[-1]][1]:
             if el in visited:
@@ -37,55 +43,33 @@ def solve(edges: list[tuple[str, str]]) -> list[str]:
             new_way.append(el)
             que.append(new_way)
 
-        if point[-1] == end_lvl:
-            if outs_at_lvl:
-                outs_at_lvl.sort()
-                min_out = outs_at_lvl[0][0]
-                close_outs = [x for x in outs_at_lvl if min_out in x]
-                close_outs.sort()
-                if my_turn:
-                    ways.sort()
-                    for chose_out in close_outs:
-                        for el in ways:
-                            if el[-1] == chose_out[1]:
-                                closed_out = chose_out
-                                break
-                        else:
-                            continue
-                        break
-                    result.append(closed_out)
-                    outs_count -= 1
-                    ind = g[closed_out[1]][0].index(closed_out[0])
-                    g[closed_out[1]][0].pop(ind)
-                    que = deque()
-                    que.append([start_lvl])
-                    my_turn = False
-                else:
-                    monstr_move = 'z'
-                    ways.sort()
-                    for el in ways:
-                        for chose_out in close_outs:
-                            if el[-1] == chose_out[1]:
-                                monstr_move = el[1]
-                                break
-                        else:
-                            continue
-                        break
-                    que = deque()
-                    que.append([monstr_move])
-                    start_lvl = monstr_move
-                    my_turn = True
-                outs_at_lvl = list()
-                first = que.popleft()
-                visited = set()
-                ways = list()
-                end_lvl = g[first[0]][1][-1]
-                que.append(first)
+        if outs_counter == total_outs:
+            ways_to_outs.sort(key=lambda x: (x[-1], x[:-1]))
+            if my_turn:
+                for pick_out in ways_to_outs:
+                    monstr_pos = pick_out[0]
+                    if g[monstr_pos][0] and pick_out[-1] not in g[monstr_pos][0]:
+                        continue
+                    closed_out = pick_out
+                    break
+                total_outs -= 1
+                result.append(closed_out[-1:-3:-1])
+                ind = g[closed_out[-2]][0].index(closed_out[-1])
+                g[closed_out[-2]][0].pop(ind)
+                que = deque()
+                que.append([closed_out[0]])
+                my_turn = False
             else:
-                for el in reversed(g[point[-1]][1]):
-                    if el not in visited:
-                        end_lvl = el
-                        break
+                ways_to_outs.sort()
+                monstr_move = ways_to_outs[0][1]
+                que = deque()
+                que.append([monstr_move])
+                my_turn = True
+            outs = list()
+            visited = set()
+            ways = list()
+            ways_to_outs = list()
+            outs_counter = 0
 
     return ["-".join(x) for x in result]
 
@@ -129,7 +113,9 @@ def add_edge(d: dict, edge: tuple[str, str]):
 
 def main():
     edges = []
+    # q = "a-b\nb-c\nc-d\nc-e\nA-d\nA-e\nc-f\nc-g\nf-B\ng-B"
     for line in sys.stdin:
+    # for line in q.split("\n"):
         line = line.strip()
         if line:
             node1, sep, node2 = line.partition('-')
