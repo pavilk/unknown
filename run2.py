@@ -58,14 +58,11 @@ def solve(edges: list[tuple[str, str]]) -> list[str]:
                 else:
                     monstr_move = 'z'
                     ways.sort()
-                    for el in ways:
-                        for chose_out in close_outs:
-                            if el[-1] == chose_out[1]:
-                                monstr_move = el[1]
-                                break
-                        else:
-                            continue
-                        break
+                    chose_out = close_outs[0]
+                    for chose_out in close_outs:
+                        if el[-1] == chose_out[1]:
+                            monstr_move = el[1]
+                            break
                     que = deque()
                     que.append([monstr_move])
                     start_lvl = monstr_move
