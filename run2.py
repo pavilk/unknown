@@ -5,8 +5,6 @@ from collections import deque
 
 def solve(edges: list[tuple[str, str]]) -> list[str]:
     g = {}
-    outs = {}
-    outs_count = create_graph(edges, g, outs)
     for keys in g.keys():
         g[keys][0].sort()
         g[keys][1].sort()
