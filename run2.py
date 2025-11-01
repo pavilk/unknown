@@ -43,14 +43,11 @@ def solve(edges: list[tuple[str, str]]) -> list[str]:
                 close_outs.sort()
                 if my_turn:
                     ways.sort()
-                    for chose_out in close_outs:
-                        for el in ways:
-                            if el[-1] == chose_out[1]:
-                                closed_out = chose_out
-                                break
-                        else:
-                            continue
-                        break
+                    chose_out = close_outs[0]
+                    for el in ways:
+                        if el[-1] == chose_out[1]:
+                            closed_out = chose_out
+                            break
                     result.append(closed_out)
                     outs_count -= 1
                     ind = g[closed_out[1]][0].index(closed_out[0])
